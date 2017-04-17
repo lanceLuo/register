@@ -1,0 +1,3 @@
+register.dobest.com/register/emailSucc?email=278937966@qq.com&paraString=appId%3D299%26tabIndex%3Dusername&appId=299&areaId=0&accountType=email&requestId=RSC0381AAEC7F22154FBE755238F63A52D0
+
+register.dobest.com/user/register/confirm-needed-email.jsonp?callback=jQuery182004314703061969549_1492409059460&appId=299&areaId=0&advfrom=&password=Qaz123456&email=278937966%40qq.com&sessionKey=6JgvHEfNs9l42Ssd&backUrl=http%3A%2F%2Fregister.dobest.com%2Fregister%2FEmailConfirm%3FserviceUrl%3Dhttp%253A%252F%252Fwww.yokagames.com%252F%26locationTarget%3Dpartial%26customerAcc%3D278937966%40qq.com%26accountType%3Demail%26emailResultNewId%3D1&validateCode=4h8ay3&isInner=1&_=1492410244597
