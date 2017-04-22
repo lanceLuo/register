@@ -4,11 +4,13 @@ import hashlib
 import os
 import random
 import urllib
+from wx.lib.pubsub import pub
+from lib.EvtName import EvtName
 import time
 import threading
 import json
 import urllib2
-from datetime import *
+import datetime
 from service.RuokuaiParam import *
 
 
@@ -63,8 +65,6 @@ class RuokuaiApiClient(object):
         return response.text
 
     def login_evt_listener(self, data, extra1, extra2=None):
-        self.name = data.get('name', None)
-        self.password = data.get('password', None)
         self.th_update_info = threading.Thread(target=self.worker_handler, args=(data.get('name', None), data.get('password', None)), name='img_v_acount_info_worker')
         self.th_update_info.setDaemon(1)
         self.th_update_info.start()
@@ -73,11 +73,15 @@ class RuokuaiApiClient(object):
         self.name = name
         self.password = password
         result = self.get_account_info()
-        print result
-        if result['code'] == 200:
-            pass
-        else:
+        if result['code'] != 200:
+            pub.sendMessage(EvtName.evt_login_end, data={'type': 'img', 'is_success': False, 'msg': result['msg']},
+                            extra1=u'打码账号登陆')
+            print result
             return
+        else:
+            pub.sendMessage(EvtName.evt_login_end, data={'type': 'img', 'is_success': True, 'msg': result['msg']},
+                            extra1=u'打码账号登陆')
+            pass
         while True:
             time.sleep(5)
             result = self.get_account_info()
@@ -91,7 +95,6 @@ class RuokuaiApiClient(object):
         result = self.http_request('http://api.ruokuai.com/info.json', {})
         if not result:
             return {'code': 201, 'msg': u'网络异常'}
-        print result
         result = json.loads(result)
         if not isinstance(result, dict) or result.get('Error_Code', None) is not None:
             return {'code': 202, 'msg': u"网络异常" if not isinstance(result, dict) else result['Error']}

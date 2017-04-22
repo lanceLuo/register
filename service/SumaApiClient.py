@@ -2,6 +2,7 @@
 import threading
 import time
 from wx.lib.pubsub import pub
+from lib.EvtName import EvtName
 from lib.Download import Download
 
 
@@ -37,7 +38,7 @@ class SumaApiClient(Download):
     '''
     '''
     def login_evt_listener(self, data, extra1, extra2=None):
-        if isinstance(data, dict):
+        if not isinstance(data, dict):
             data = {}
         self.th_update_info = threading.Thread(target=self.worker_handler, args=(data.get('name', None), data.get('password')), name='mobile_v_account_info_worker')
         self.th_update_info.setDaemon(1)
@@ -46,8 +47,12 @@ class SumaApiClient(Download):
     def worker_handler(self, name, password):
         result = self.login(name, password)
         if result['code'] == 200:
-            pass
+            pub.sendMessage(EvtName.evt_login_end, data={'type': 'mobile', 'is_success': True, 'msg': result['msg']},
+                            extra1=u'短信账号登陆')
         else:
+            print result
+            pub.sendMessage(EvtName.evt_login_end, data={'type': 'mobile', 'is_success': False, 'msg': result['msg']},
+                            extra1=u'短信账号登陆')
             return
         while True:
             result = self.get_user_info()
@@ -68,7 +73,7 @@ class SumaApiClient(Download):
         if data.find("message") != -1:
             if is_retry:
                 time.sleep(0.08)
-                return self.login_in(False)
+                return self.login(name, password)
             else:
                 return {"code": 500, 'msg': u"请稍后再试"}
 
@@ -149,13 +154,13 @@ class SumaApiClient(Download):
         
 if __name__ == '__main__':
     token = '4e480361357f4a655adae694ad02444a'
-    obj = SumaApiClient("zabcd", 'b123321')
-    r = obj.login_in()
+    obj = SumaApiClient()
+    r = obj.login("zabcd", 'b123321')
     if r['code'] == 200:
         obj.set_pid(20486)
     # # 13084621303
     # r = obj.get_mobile_num()
-    r = obj.get_vcode_and_release_mobile(13005178809)
+    # r = obj.get_vcode_and_release_mobile(13005178809)
     print r
     # r = obj.get_user_info(name, token)
     # r = obj.get_vcode_and_release_mobile(name, token, 13040866252)

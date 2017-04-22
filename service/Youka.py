@@ -10,6 +10,9 @@ from service.RuokuaiApiClient import *
 from service.SumaApiClient import *
 from lib.Download import Download
 from lib.funcs import *
+from wx.lib.pubsub import pub
+from lib.EvtName import EvtName
+
 
 class Youka(object):
     reg_url = 'http://register.dobest.com'  #  注册页地址
@@ -153,7 +156,8 @@ class Youka(object):
     '''
     执行注册
     '''
-    def do_register(self, mobile, password, proxy=None):
+    def do_register(self, mobile, proxy=None):
+        password = "".join([str(random.randint(0, 9)) for i in range(8)])
         mobile = str(mobile)
         self.set_cookie_path_by_mobile(mobile)
         self.proxy = proxy
@@ -230,7 +234,8 @@ class Youka(object):
             '_': str(get_millis_time()+random.randint(20, 100))
 
         }
-        url = u"{}/user/register/confirm-needed-mobile/validation.jsonp?{}".format(self.reguser_url, dict_to_query_str(params))
+        url = u"{}/user/register/confirm-needed-mobile/validation.jsonp?{}".format(self.reguser_url,
+                                                                                   dict_to_query_str(params))
         print url
         status, result = self.download(self.reg_page_url).get(url)
         print result
@@ -241,6 +246,11 @@ class Youka(object):
             if result.get('status', None) != 0:
                 return {'code': 505, 'msg': u'请求注册失败:{}'.format(result.get('message', u'无message'))}
             else:
+                pub.sendMessage(EvtName.evt_register_success, data={
+                    'mobile': mobile,
+                    'password': password,
+                    'reg_time': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                }, extra1=u'注册成功')
                 return {'code': 200, 'msg': u"注册成功", 'mobile': mobile, 'password': password}
 
 if __name__ == '__main__':
