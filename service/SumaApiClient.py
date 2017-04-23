@@ -1,10 +1,11 @@
 # -*- coding:utf-8 -*-
 import threading
+import wx
 import time
 from wx.lib.pubsub import pub
 from lib.EvtName import EvtName
 from lib.Download import Download
-
+from lib.ParamsDefine import ParamsDefine
 
 class SumaApiClient(Download):
     err_tip = {
@@ -29,7 +30,7 @@ class SumaApiClient(Download):
         self.name = None
         self.password = None
         self.token = None
-        self.pid = None
+        self.pid = ParamsDefine.mobile_suma_pid
         self.th_update_info = None
 
     def set_pid(self, pid):
@@ -47,16 +48,16 @@ class SumaApiClient(Download):
     def worker_handler(self, name, password):
         result = self.login(name, password)
         if result['code'] == 200:
-            pub.sendMessage(EvtName.evt_login_end, data={'type': 'mobile', 'is_success': True, 'msg': result['msg']},
-                            extra1=u'短信账号登陆')
+            wx.CallAfter(pub.sendMessage, EvtName.evt_login_end,
+                         data={'type': 'mobile', 'is_success': True, 'msg': result['msg']},
+                         extra1=u'短信账号登陆')
         else:
-            print result
-            pub.sendMessage(EvtName.evt_login_end, data={'type': 'mobile', 'is_success': False, 'msg': result['msg']},
-                            extra1=u'短信账号登陆')
+            wx.CallAfter(pub.sendMessage, EvtName.evt_login_end,
+                         data={'type': 'mobile', 'is_success': False, 'msg': result['msg']},
+                         extra1=u'短信账号登陆')
             return
         while True:
             result = self.get_user_info()
-            print result
             time.sleep(5)
 
 
@@ -117,7 +118,7 @@ class SumaApiClient(Download):
             if is_retry:
                 time.sleep(0.08)
                 return self.get_mobile_num(size=size, province=province, phone_type=phone_type,
-                                          is_retry=False)
+                                           is_retry=False)
             else:
                 return {'code': 500, 'msg': u"稍后重试"}
         if data.find(u"可使用余额不足") != -1:

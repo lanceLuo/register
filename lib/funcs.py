@@ -2,6 +2,7 @@
 import time
 import json
 import re
+import random
 
 def get_millis_time():
     return int(round(time.time() * 1000))
@@ -27,3 +28,22 @@ def jsonp_to_dict(jsonp):
             if isinstance(d, dict):
                 return d
     return False
+
+
+def random_str(length, no_repeat=False):
+    if length > 18:
+        length = 18
+    s = '1234567890qwertyuiopasdfghjklzxcvbnm'
+    ls = len(s)
+    t = []
+    while True:
+        j = s[random.randint(0, ls-1)]
+        if no_repeat:
+            if j not in t:
+                t.append(j)
+        else:
+            t.append(j)
+        if len(t) >= length:
+            break
+
+    return "".join(t)

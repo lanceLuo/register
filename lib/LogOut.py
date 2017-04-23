@@ -1,7 +1,7 @@
 # -*- coding:utf-8
-import time
 import Queue
 import datetime
+import time
 import threading
 import os
 import sys
@@ -21,7 +21,7 @@ class LogOut:
     def output(self):
         while 1:
             if self.stdout.empty():
-                time.sleep(0.5)
+                time.sleep(0.3)
                 continue
             s = self.stdout.get(False)
             if self.N > 40960:

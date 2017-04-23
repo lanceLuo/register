@@ -1,11 +1,14 @@
 # -*- coding:utf-8 -*-
 import time
+import wx
 import os
 import hashlib
 import sys
 import re
 import json
 import random
+import threading
+import Queue
 from service.RuokuaiApiClient import *
 from service.SumaApiClient import *
 from lib.Download import Download
@@ -14,19 +17,59 @@ from wx.lib.pubsub import pub
 from lib.EvtName import EvtName
 
 
-class Youka(object):
+class Youka(threading.Thread):
     reg_url = 'http://register.dobest.com'  #  注册页地址
     reg_page_url = 'http://register.dobest.com/register/index?appId=299&tabIndex=username'
     back_url = 'http://www.yokagames.com/'
     reguser_url = 'http://reguser.dobest.com'
     cas_url = 'http://cas.dobest.com'
 
-    def __init__(self):
+    def __init__(self, mobile_v_handler, img_v_handler, register_queue, result_queue):
+        threading.Thread.__init__(self)
         self.file_dir = None
         self.cookie_file_path = None
-        self.m_img_v_code_handler = None
-        self.m_mobile_v_code_handler = None
+        self.m_mobile_v_code_handler = mobile_v_handler
+        self.m_img_v_code_handler = img_v_handler
         self.proxy = None
+        self.register_queue = register_queue
+        self.result_queue = result_queue
+        self.start()
+
+    def run(self):
+        register_queue = self.register_queue
+        while True:
+            if register_queue.empty():
+                break
+            try:
+                register = register_queue.get(False)
+                if not register['mobile']:
+                    mobile_result = self.m_mobile_v_code_handler.get_mobile_num()
+                    if mobile_result['code'] != 200:
+                        if mobile_result['code'] != 501:
+                            time.sleep(1)
+                            register_queue.put(register, False)
+                        else:
+                            time.sleep(1)
+                        print mobile_result['msg']
+                        continue
+                    register['mobile'] = mobile_result['phone_list'][0]
+
+                result = self.do_register(register['mobile'], proxy=register['ip'], password=register['password'])
+                if result['code'] != 200:
+                    print result['msg']
+                    time.sleep(1)
+                    register_queue.put(register, False)
+                    continue
+                new_account = {
+                    'mobile': register['mobile'],
+                    'password': register['password'],
+                    'reg_time': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                }
+                wx.CallAfter(pub.sendMessage, EvtName.evt_register_success, data=new_account, extra1=u'注册成功')
+                self.result_queue.put(new_account, False)
+            except Queue.Empty:
+                time.sleep(0.01)
+
 
     '''
     请求发送验证码
@@ -156,8 +199,7 @@ class Youka(object):
     '''
     执行注册
     '''
-    def do_register(self, mobile, proxy=None):
-        password = "".join([str(random.randint(0, 9)) for i in range(8)])
+    def do_register(self, mobile, proxy=None, password=None):
         mobile = str(mobile)
         self.set_cookie_path_by_mobile(mobile)
         self.proxy = proxy
@@ -214,7 +256,6 @@ class Youka(object):
             time.sleep(2)
             # 获取短信验证码
             result = self.m_mobile_v_code_handler.get_vcode_and_release_mobile(mobile)
-            print result
             if result['code'] == 200:
                 mobile_v_code = re.findall(r'\D+(\d+)', result['vcode'])[0]
                 break
@@ -236,9 +277,7 @@ class Youka(object):
         }
         url = u"{}/user/register/confirm-needed-mobile/validation.jsonp?{}".format(self.reguser_url,
                                                                                    dict_to_query_str(params))
-        print url
         status, result = self.download(self.reg_page_url).get(url)
-        print result
         if not status:
             return {'code': 505, 'msg': u'请求注册失败'}
         else:
@@ -246,11 +285,6 @@ class Youka(object):
             if result.get('status', None) != 0:
                 return {'code': 505, 'msg': u'请求注册失败:{}'.format(result.get('message', u'无message'))}
             else:
-                pub.sendMessage(EvtName.evt_register_success, data={
-                    'mobile': mobile,
-                    'password': password,
-                    'reg_time': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                }, extra1=u'注册成功')
                 return {'code': 200, 'msg': u"注册成功", 'mobile': mobile, 'password': password}
 
 if __name__ == '__main__':

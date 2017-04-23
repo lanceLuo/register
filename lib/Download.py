@@ -94,8 +94,3 @@ class Download:
         fp = open(dirname + "/http-{}.log".format(d), "a+")
         fp.write(msg + "\r\n")
         fp.close()
-
-if __name__ == '__main__':
-    t = Http4Pycurl(None)
-    r, s = t.get("http://www.juanpi.com")
-    print r,s

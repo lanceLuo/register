@@ -2,6 +2,7 @@
 import sys
 import hashlib
 import os
+import wx
 import random
 import urllib
 from wx.lib.pubsub import pub
@@ -11,7 +12,7 @@ import threading
 import json
 import urllib2
 import datetime
-from service.RuokuaiParam import *
+from lib.ParamsDefine import ParamsDefine
 
 
 class RuokuaiApiClient(object):
@@ -37,7 +38,7 @@ class RuokuaiApiClient(object):
     '''
     '''
     def http_upload_image(self, url, param_keys, param_dict, filebytes):
-        timestr = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        timestr = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         boundary = '------------' + hashlib.md5(timestr).hexdigest().lower()
         boundarystr = '\r\n--%s\r\n' % (boundary)
 
@@ -74,18 +75,17 @@ class RuokuaiApiClient(object):
         self.password = password
         result = self.get_account_info()
         if result['code'] != 200:
-            pub.sendMessage(EvtName.evt_login_end, data={'type': 'img', 'is_success': False, 'msg': result['msg']},
-                            extra1=u'打码账号登陆')
-            print result
+            wx.CallAfter(pub.sendMessage, EvtName.evt_login_end,
+                         data={'type': 'img', 'is_success': False, 'msg': result['msg']},
+                         extra1=u'打码账号登陆')
             return
         else:
-            pub.sendMessage(EvtName.evt_login_end, data={'type': 'img', 'is_success': True, 'msg': result['msg']},
-                            extra1=u'打码账号登陆')
+            wx.CallAfter(pub.sendMessage, EvtName.evt_login_end, data={'type': 'img', 'is_success': True, 'msg': result['msg']},
+                         extra1=u'打码账号登陆')
             pass
         while True:
             time.sleep(5)
             result = self.get_account_info()
-            print result
 
     '''
     获取账户信息
@@ -109,10 +109,10 @@ class RuokuaiApiClient(object):
         param_dict = {
             'username': self.name,
             'password': self.password,
-            'timeout': RuokuaiParam.time_out,
-            'typeid': RuokuaiParam.type_id,
-            'softid': RuokuaiParam.soft_id,
-            'softkey': RuokuaiParam.soft_key,
+            'timeout': ParamsDefine.img_v_time_out,
+            'typeid': ParamsDefine.img_v_ruokuai_type_id,
+            'softid': ParamsDefine.img_v_ruokuai_soft_id,
+            'softkey': ParamsDefine.img_v_ruokuai_soft_key,
         }
         param_keys = ['username',
                      'password',
@@ -140,8 +140,8 @@ class RuokuaiApiClient(object):
     def report_error(self, topic_id):
         params_dic = {
             'id': topic_id,
-            'softid': RuokuaiParam.soft_id,
-            'softkey': RuokuaiParam.soft_key
+            'softid': ParamsDefine.img_v_ruokuai_soft_id,
+            'softkey': ParamsDefine.img_v_ruokuai_soft_key
         }
         #  {"Error":"报错ID错误.","Error_Code":"10211","Request":""}
         #  {"Result":"报错成功/报错成功2"}
