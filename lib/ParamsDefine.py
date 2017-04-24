@@ -1,4 +1,6 @@
 # -*- coding:utf-8 -*-
+import sys
+import os
 
 
 class ParamsDefine:
@@ -10,6 +12,10 @@ class ParamsDefine:
     platform_url = 'http://www.dobest.com'
     set_std = True
     mobile_suma_pid = 20486
+    mobile_v_regist_url = 'www.eobzz.com/newUpPage/registered.html?makeUserID=weilong'
+    img_v_regist_url = 'http://www.dobest.com'
+    register_title = u'游卡注册助手  By：卫龙  QQ：83605654   线报群：309770518'
+    register_save_path = u"{}{}".format(os.path.dirname(sys.argv[0]), u"/data/account.txt")
 
     def __init__(self):
         pass

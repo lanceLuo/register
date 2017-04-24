@@ -20,7 +20,7 @@ from lib.funcs import *
 class MainFrame(wx.Frame):
 
     def __init__(self, parent):
-        self.title = u"注册助手"
+        self.title = ParamsDefine.register_title
         frame_size = (830, 490)
         wx.Frame.__init__(self, parent, wx.ID_ANY, self.title, size=frame_size)
         self.SetMaxSize(frame_size)
@@ -31,29 +31,36 @@ class MainFrame(wx.Frame):
         self.m_img_v_handler = RuokuaiApiClient()
         # ===============以下为手机短信验证码账号信息=========
         self.m_phone_v_panel = wx.Panel(self, wx.ID_ANY, pos=(510, 5), size=(290, 70), style=wx.BORDER_THEME)
-        self.label_mobile_v_account = wx.StaticText(self.m_phone_v_panel, wx.ID_ANY, u"帐号:", (5, 5), wx.DefaultSize, 0)
-        self.text_mobile_v_account = wx.TextCtrl(self.m_phone_v_panel, wx.ID_ANY, '', (34, 5), (80, 20), 0,)
+        self.label_mobile_v_title = wx.StaticText(self.m_phone_v_panel, wx.ID_ANY, u"短信平台", (5, -2), wx.DefaultSize, 0)
+        self.label_mobile_v_account = wx.StaticText(self.m_phone_v_panel, wx.ID_ANY, u"帐号:", (25, 20), wx.DefaultSize, 0)
+        self.text_mobile_v_account = wx.TextCtrl(self.m_phone_v_panel, wx.ID_ANY, '', (54,20), (80, 20), 0,)
         self.text_mobile_v_account.SetBackgroundColour(wx.Colour(245, 245, 245))
-        self.label_mobile_v_password = wx.StaticText(self.m_phone_v_panel, wx.ID_ANY, u"密码:", (115, 5), wx.DefaultSize, 0)
-        self.text_mobile_v_password = wx.TextCtrl(self.m_phone_v_panel, wx.ID_ANY, '', (145, 5), (80, 20), wx.TE_PASSWORD)
+        self.label_mobile_v_password = wx.StaticText(self.m_phone_v_panel, wx.ID_ANY, u"密码:", (135, 20), wx.DefaultSize, 0)
+        self.text_mobile_v_password = wx.TextCtrl(self.m_phone_v_panel, wx.ID_ANY, '', (165, 20), (80, 20), wx.TE_PASSWORD)
         self.text_mobile_v_password.SetBackgroundColour(wx.Colour(245, 245, 245))
-        self.btn_mobile_v_login = wx.Button(self.m_phone_v_panel, wx.ID_ANY, u"短信登陆", (225, 5), (60, 20), 0)
+        self.btn_mobile_v_login = wx.Button(self.m_phone_v_panel, wx.ID_ANY, u"登陆", (25, 45), (60, 20), 0)
         self.btn_mobile_v_login.Bind(wx.EVT_BUTTON, self.mobile_v_login)
+        self.btn_mobile_v_regist = wx.Button(self.m_phone_v_panel, wx.ID_ANY, u"注册 ", (90, 45), (60, 20), 0)
+        self.btn_mobile_v_regist.Bind(wx.EVT_BUTTON, self.mobile_v_regist)
 
         # ===============以下为图片识别账号信息=========
         self.m_img_v_panel = wx.Panel(self, wx.ID_ANY, pos=(510, 80), size=(290, 70), style=wx.BORDER_THEME)
-        self.label_img_v_account = wx.StaticText(self.m_img_v_panel, wx.ID_ANY, u"帐号:", (5, 5), wx.DefaultSize, 0)
-        self.text_img_v_account = wx.TextCtrl(self.m_img_v_panel, wx.ID_ANY, '', (34, 5), (80, 20), 0,)
+        self.label_img_v_title = wx.StaticText(self.m_img_v_panel, wx.ID_ANY, u"打码平台", (5, -2), wx.DefaultSize, 0)
+        self.label_img_v_account = wx.StaticText(self.m_img_v_panel, wx.ID_ANY, u"帐号:", (25, 20), wx.DefaultSize, 0)
+        self.text_img_v_account = wx.TextCtrl(self.m_img_v_panel, wx.ID_ANY, '', (54, 20), (80, 20), 0,)
         self.text_img_v_account.SetBackgroundColour(wx.Colour(245, 245, 245))
-        self.label_img_v_password = wx.StaticText(self.m_img_v_panel, wx.ID_ANY, u"密码:", (115, 5), wx.DefaultSize, 0)
-        self.text_img_v_password = wx.TextCtrl(self.m_img_v_panel, wx.ID_ANY, '', (145, 5), (80, 20), wx.TE_PASSWORD)
+        self.label_img_v_password = wx.StaticText(self.m_img_v_panel, wx.ID_ANY, u"密码:", (135, 20), wx.DefaultSize, 0)
+        self.text_img_v_password = wx.TextCtrl(self.m_img_v_panel, wx.ID_ANY, '', (165, 20), (80, 20), wx.TE_PASSWORD)
         self.text_img_v_password.SetBackgroundColour(wx.Colour(245, 245, 245))
-        self.btn_img_v_login = wx.Button(self.m_img_v_panel, wx.ID_ANY, u"打码登陆", (225, 5), (60, 20), 0)
+        self.btn_img_v_login = wx.Button(self.m_img_v_panel, wx.ID_ANY, u"登陆", (25, 45), (60, 20), 0)
         self.btn_img_v_login.Bind(wx.EVT_BUTTON, self.img_v_login)
+        self.btn_img_v_regist = wx.Button(self.m_img_v_panel, wx.ID_ANY, u"注册", (90, 45), (60, 20), 0)
+        self.btn_img_v_regist.Bind(wx.EVT_BUTTON, self.img_v_regist)
+
         # ===============网络选择=========
         self.ip_panel = wx.Panel(self, wx.ID_ANY, pos=(510, 155), size=(290, 100), style=wx.BORDER_THEME)
         self.m_radio_box = wx.RadioBox(self.ip_panel, wx.ID_ANY, '', (2, -5), wx.DefaultSize,
-                                       [u"本地", u"宽带拨号换IP", u"导入IP.txt"], 3, wx.RA_SPECIFY_ROWS)
+                                       [u"无需更换IP", u"宽带拨号换IP", u"导入IP.txt"], 3, wx.RA_SPECIFY_ROWS)
         self.m_radio_box.Bind(wx.EVT_RADIOBOX, self.set_ip)
         # ===============ADSL=============
         self.label_adsl_account = wx.StaticText(self.ip_panel, wx.ID_ANY, u"宽带帐号:", (120, 15), wx.DefaultSize, 0)
@@ -90,9 +97,8 @@ class MainFrame(wx.Frame):
         # # 暂停购票按钮
         self.btn_off_buy = wx.Button(self, wx.ID_ANY, u"暂停注册", (580, 400), (60, 30), 0)
         # # # 保存购票成功记录
-        self.btn_save_success = wx.Button(self, wx.ID_ANY, u"保存账号", (650, 400), (60, 30), 0)
-        self.btn_platform_url = wx.Button(self, wx.ID_ANY, u"平台地址", (720, 400), (60, 30), 0)
-        self.btn_platform_url.Bind(wx.EVT_BUTTON, self.open_platform_url)
+        self.btn_save_success = wx.Button(self, wx.ID_ANY, u"查看账号", (650, 400), (60, 30), 0)
+        self.btn_save_success.Bind(wx.EVT_BUTTON, self.viw_regist)
         self.grid = AccountGrid(self)
         # 错误信息面板
         self.notebook = wx.Notebook(self, wx.ID_ANY, (2, 300), (500, 150))
@@ -324,11 +330,17 @@ class MainFrame(wx.Frame):
         self.btn_on_register.SetLabelText(u"开始注册")
         self.btn_on_register.Enable()
 
-    '''
-    '''
     @staticmethod
-    def open_platform_url(evt):
-        webbrowser.open(ParamsDefine.platform_url)
+    def mobile_v_regist(evt):
+        webbrowser.open(ParamsDefine.mobile_v_regist_url)
+
+    @staticmethod
+    def img_v_regist(evt):
+        webbrowser.open(ParamsDefine.img_v_regist_url)
+
+    @staticmethod
+    def viw_regist(evt):
+        os.system('notepad {}'.format(ParamsDefine.register_save_path))
 
     def on_close_window(self, evt):
         self.Destroy()

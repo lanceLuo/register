@@ -4,6 +4,7 @@ import time
 import Queue
 import os
 import sys
+from lib.ParamsDefine import ParamsDefine
 
 
 class RegisterResult(threading.Thread):
@@ -24,7 +25,7 @@ class RegisterResult(threading.Thread):
                 new_account = self.result_queue.get(False)
                 try:
                     s = u"{}            {}            {}".format(new_account['mobile'], new_account['password'], new_account['reg_time'])
-                    f = open(os.path.dirname(sys.argv[0]) + u"/data/账号.txt", 'a+')
+                    f = open(ParamsDefine.register_save_path, 'a+')
                     f.write(s + "\r")
                     f.close()
                 except:
