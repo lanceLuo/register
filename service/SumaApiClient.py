@@ -56,9 +56,9 @@ class SumaApiClient(Download):
                          data={'type': 'mobile', 'is_success': False, 'msg': result['msg']},
                          extra1=u'短信账号登陆')
             return
-        while True:
-            result = self.get_user_info()
-            time.sleep(5)
+        # while True:
+        #     result = self.get_user_info()
+        #     time.sleep(5)
 
 
     '''

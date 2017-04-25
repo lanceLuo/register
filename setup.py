@@ -16,12 +16,23 @@ setup(
             # "icon_resources": [(1, "buy.ico")]
         }],
     options={
-        'py2exe':
-                   {
-                       'dll_excludes':['MSVCP90.dll', 'numpy-atlas.dll'],
-                        "includes": [],
-                        'excludes': ['_gtkagg', '_tkagg', '_agg2', '_cairo', '_cocoaagg', '_fltkagg', '_gtk', '_gtkcairo', ]
-                   }
+        'py2exe': {
+                       'dll_excludes':['MSVCP90.dll',
+                                       # 'numpy-atlas.dll'
+                                        "w9xpopen.exe",
+                                       'libcurl.dll'
+                                       ],
+                       'packages': ['wx.lib.pubsub'],
+                       "bundle_files": 1,
+                       "optimize": 2,
+                       "compressed": 1,
+            "ascii": 1,
+                        "includes": ['pycurl'],
+                        # "excludes":['pycurl']
+                       # 'excludes': ['_gtkagg', '_tkagg', '_agg2', '_cairo', '_cocoaagg', '_fltkagg', '_gtk', '_gtkcairo', ]
+                   },
     },
+    zipfile=None,
+    version="0.0.1.0",
     data_files=data_files
 )

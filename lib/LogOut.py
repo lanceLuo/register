@@ -6,7 +6,7 @@ import threading
 import os
 import sys
 import copy
-
+from lib.funcs import *
 
 class LogOut:
     def __init__(self, obj):
@@ -29,7 +29,7 @@ class LogOut:
                 self.obj.Box.Clear()
             self.obj.Box.AppendText(s)
             cdate = datetime.datetime.now().strftime('%d-%m-%y')
-            dirname = os.path.dirname(sys.argv[0]) + "/data/log"
+            dirname = get_main_dir().decode('gb2312') + "/data/log"
             if threading.current_thread().getName() == "S_0":
                 filename = dirname + "/info_" + cdate + ".log"
             else:

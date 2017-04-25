@@ -108,9 +108,10 @@ class MainFrame(wx.Frame):
         self.notebook_err_tip = TipPage(self.notebook, 'err')
         self.notebook.AddPage(self.notebook_err_tip, u"  错误信息  ")
         self.tip_log = LogOut(self.notebook_info_tip)
+        self.err_log = LogOut(self.notebook_err_tip)
         if ParamsDefine.set_std:
             sys.stdout = self.tip_log
-            # sys.stderr = self.err_log
+            sys.stderr = self.err_log
         self.log_thread = []
         for i in range(1):
             if i == 0:

@@ -1,9 +1,9 @@
 # -*- coding:utf-8 -*-
-import time
-import wx
 import os
-import hashlib
 import sys
+import wx
+import hashlib
+import time
 import re
 import json
 import random
@@ -56,10 +56,14 @@ class Youka(threading.Thread):
 
                 result = self.do_register(register['mobile'], proxy=register['ip'], password=register['password'])
                 if result['code'] != 200:
-                    print result['msg']
-                    time.sleep(1)
-                    register_queue.put(register, False)
+                    if result['code'] == 201:
+                        print u"该手机号已注册过--{}".format(register['mobile'])
+                    else:
+                        print result['msg']
+                        time.sleep(1)
+                        register_queue.put(register, False)
                     continue
+                #  注册成功
                 new_account = {
                     'mobile': register['mobile'],
                     'password': register['password'],
@@ -175,7 +179,7 @@ class Youka(threading.Thread):
     获取cookie保存地址
     '''
     def set_cookie_path_by_mobile(self, mobile):
-        file_dir = os.path.dirname(sys.argv[0]) + '{}data{}{}{}'.format(os.sep, os.sep, mobile, os.sep)
+        file_dir = get_main_dir().decode('gb2312') + '{}data{}{}{}'.format(os.sep, os.sep, mobile, os.sep)
         if not os.path.exists(file_dir):
             os.makedirs(file_dir)
 

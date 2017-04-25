@@ -1,8 +1,11 @@
 # -*- coding:utf-8 -*-
+import sys
+import os
 import time
 import json
 import re
 import random
+
 
 def get_millis_time():
     return int(round(time.time() * 1000))
@@ -47,3 +50,21 @@ def random_str(length, no_repeat=False):
             break
 
     return "".join(t)
+
+
+def main_is_frozen():
+    """Return ''True'' if we're running from a frozen program."""
+    import imp
+    return (
+        # new py2exe
+        hasattr(sys, "frozen") or
+        # tools/freeze
+        imp.is_frozen("__main__"))
+
+
+def get_main_dir():
+    """Return the script directory - whether we're frozen or not."""
+    if main_is_frozen():
+        return os.path.abspath(os.path.dirname(sys.executable))
+    return os.path.abspath(os.path.dirname(sys.argv[0]))
+

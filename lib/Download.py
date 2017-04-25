@@ -7,6 +7,7 @@ import os
 import sys
 import datetime
 import json
+from lib.funcs import *
 
 
 class Download:
@@ -88,7 +89,7 @@ class Download:
 
     def write_log(self, msg):
         d = datetime.datetime.now().strftime('%y-%d-%m')
-        dirname = os.path.dirname(sys.argv[0]) + "/data/log"
+        dirname = get_main_dir().decode('gb2312') + "/data/log"
         if not os.path.exists(dirname):
             os.mkdir(dirname)
         fp = open(dirname + "/http-{}.log".format(d), "a+")
